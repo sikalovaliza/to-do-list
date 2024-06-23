@@ -1,16 +1,27 @@
-# todo_list
+1.Реализована верстка двух страниц
 
-A new Flutter project.
 
-## Getting Started
+Главная страница:
+1. Скролл списка дел(не более трех строк для одного дела), сжимание app_bar при скролле
+2. Кнопка просмотра списка вместе с выполненными задачами(логика пока работает неправильно, но в этом задании не нужно было)
+3. Кнопка редактирования каждой задачи и добавление новой
+4. Свайп удаления задачи и свайп отметки "выполнено", здесь разместила иконки в центре строки(мне кажется визуально более логичным эффектом)
+5. Кнопка "новое" в конце списка, пока без логики
 
-This project is a starting point for a Flutter application.
+Страница для редактирования/добавления задачи
+1. Текстовое поле для ввода задачи
+2. Настройка уровня важности
+3. Переключатель с появляющимся календарем и заполнением даты дедлайна
+4. Кнопки удалить, сохранить, 'х'
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+2. У приложения есть иконка под разные размеры(для андроида)
+3. А так же реализованно логирования для свайпа пользователем влева и вправо задачи
+4. Код отформатирован
+5. Прикреплен apk-release файл
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+![внешний вид приложения](/screens/Снимок%20экрана%202024-06-23%20в%2001.35.05.png)
+![внешний вид приложения](/screens/2.png)
+![внешний вид приложения](/screens/3.png)
+![внешний вид приложения](/screens/4.png)

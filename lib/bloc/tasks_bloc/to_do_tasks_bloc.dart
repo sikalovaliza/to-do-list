@@ -12,6 +12,7 @@ part 'to_do_tasks_state.dart';
 class ToDoTasksBloc extends Bloc<ToDoTasksEvent, ToDoTasksState> {
   List<Task> resultList = [];
   List<Task> tasks = items;
+  int count_id = 15;
   int doneCounter = 0;
   var logger = Logger();
   bool isComplitedHide = false;

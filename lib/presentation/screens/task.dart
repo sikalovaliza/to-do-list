@@ -12,6 +12,7 @@ int countOfDoneTask = 0;
 
 class TaskPage extends StatefulWidget {
   Task? task;
+
   TaskPage({super.key, this.task});
 
   @override
@@ -76,11 +77,11 @@ class _TaskPageState extends State<TaskPage> {
       context.read<ToDoTasksBloc>().add(
         TodoTasksAddEvent(
           task: Task(
-            id: 'абоба',
+            id: DateTime.now().toString(),
             text: userInput,
             importance: importance,
             done: false,
-            deadline: selectedDeadline!,
+            deadline: selectedDeadline,
             createdAt: 12345567,
             changedAt: 12345667,
             lastUpdatedBy: "22222332332"),
@@ -95,7 +96,7 @@ class _TaskPageState extends State<TaskPage> {
                 text: userInput,
                 importance: importance,
                 done: false,
-                deadline: selectedDeadline!,
+                deadline: selectedDeadline,
                 createdAt: 12345567,
                 changedAt: 12345667,
                 lastUpdatedBy: "20062024"),

@@ -2,7 +2,7 @@ class Task {
   String id;
   String text;
   String importance;
-  int deadline;
+  int? deadline;
   bool done;
   String color;
   int createdAt;

@@ -2,20 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import '../screens/home.dart';
+import '../../data/database.dart';
+import '../../bloc/tasks_bloc/to_do_tasks_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+
+int countOfDoneTask = 0;
+
 
 class TaskPage extends StatefulWidget {
-  bool isEdit = false;
-  TaskPage({super.key, required this.isEdit});
+  Task? task;
+  TaskPage({super.key, this.task});
 
   @override
   _TaskPageState createState() => _TaskPageState();
 }
 
 class _TaskPageState extends State<TaskPage> {
-  bool _isDateSet = false;
+  late TextEditingController _textEditingController;
   String _selectedImportance = 'Нет';
+  bool _isDateSet = false;
   DateTime? _selectedDate;
-  DateTime? _formattedDate;
+  int? selectedDeadline;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _textEditingController = TextEditingController();
+    
+    if (widget.task != null) {
+      _textEditingController.text = widget.task!.text;
+      if (widget.task!.importance == 'important') {
+        _selectedImportance = 'Высокий';
+      } else if(widget.task!.importance == 'low') {
+        _selectedImportance = 'Низкий';
+      }
+      selectedDeadline = widget.task!.deadline;
+    }
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
 
   void _showDatePickerDialog() async {
     await initializeDateFormatting('ru');
@@ -27,11 +58,52 @@ class _TaskPageState extends State<TaskPage> {
     );
 
     if (picked != null) {
+      final int deadlineTimestamp = picked.millisecondsSinceEpoch ~/ 1000;
       setState(() {
         _selectedDate = picked;
+        selectedDeadline = deadlineTimestamp;
       });
     }
   }
+
+  String importance = 'low';
+  
+
+  void saveTask() {
+    
+    String userInput = _textEditingController.text;
+    if (widget.task == null && userInput.isNotEmpty) {
+      context.read<ToDoTasksBloc>().add(
+        TodoTasksAddEvent(
+          task: Task(
+            id: 'абоба',
+            text: userInput,
+            importance: importance,
+            done: false,
+            deadline: selectedDeadline!,
+            createdAt: 12345567,
+            changedAt: 12345667,
+            lastUpdatedBy: "22222332332"),
+        ),
+      );
+    } else if (userInput.isNotEmpty) {
+        context.read<ToDoTasksBloc>().add(
+          TodoTasksChangeTaskEvent(
+            id: widget.task!.id,
+            task: Task(
+                id: widget.task!.id,
+                text: userInput,
+                importance: importance,
+                done: false,
+                deadline: selectedDeadline!,
+                createdAt: 12345567,
+                changedAt: 12345667,
+                lastUpdatedBy: "20062024"),
+          ),
+        );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +127,7 @@ class _TaskPageState extends State<TaskPage> {
                   builder: (context) => const Main(),
                 ),
               );
-              //todo сохранение новости в общий список
+              saveTask();
             },
             child: const Text(
               'СОХРАНИТЬ',
@@ -71,15 +143,20 @@ class _TaskPageState extends State<TaskPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const TextField(
-              decoration: InputDecoration(
-                hintText: 'Что надо сделать...',
-                border: OutlineInputBorder(),
-              ),
+            TextField(
+              controller: _textEditingController,
+              decoration: widget.task != null
+                  ? const InputDecoration(
+                      hintText: '',
+                      border: OutlineInputBorder(),
+                    )
+                  : const InputDecoration(
+                      hintText: 'Что надо сделать...',
+                      border: OutlineInputBorder(),
+                    ),
               maxLines: 3,
-              //expands: true,
             ),
-            const SizedBox(height: 16.0),
+           const SizedBox(height: 16.0),
             Row(
               children: [
                 const Text(
@@ -109,7 +186,14 @@ class _TaskPageState extends State<TaskPage> {
                   onChanged: (String? newValue) {
                     setState(() {
                       _selectedImportance = newValue!;
-                    });
+                      if (_selectedImportance == 'Нет') {
+                        importance = 'basic';
+                      } else if (_selectedImportance == 'Низкий') {
+                        importance = 'low';
+                      } else if (_selectedImportance == 'Высокий') {
+                        importance = 'important';
+                      }
+                   });
                   },
                 ),
               ],
@@ -143,14 +227,16 @@ class _TaskPageState extends State<TaskPage> {
             const SizedBox(height: 16.0),
             TextButton.icon(
               onPressed: () {
-                // Действие при нажатии на кнопку "Удалить"
+                context.read<ToDoTasksBloc>()
+                .add(TodoTasksRemoveEvent(id: widget.task!.id));
+              Navigator.of(context).pop();
               },
               icon: Icon(Icons.delete,
-                  color: widget.isEdit ? Colors.red : Colors.grey),
+                  color: widget.task == null ? Colors.red : Colors.grey),
               label: Text(
                 'Удалить',
                 style:
-                    TextStyle(color: widget.isEdit ? Colors.red : Colors.grey),
+                    TextStyle(color:widget.task == null ? Colors.red : Colors.grey),
               ),
             ),
           ],

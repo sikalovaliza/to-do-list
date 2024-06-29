@@ -1,0 +1,17 @@
+  FutureOr<void> _onTodoTasksChangeDoneVisibilityEvent(
+    TodoTasksChangeDoneVisibilityEvent event, Emitter<ToDoTasksState> emit) {
+    emit(TodoTaskLoadingState());
+    isComplitedHide = !isComplitedHide;
+    _filterFunction();
+    emit(TodoTaskLoadedState(tasks: resultList, doneCounter: doneCounter));
+  }
+
+  Future<FutureOr<void>> _onTasksLoadEvent(
+    TodoTasksLoadEvent event, Emitter<ToDoTasksState> emit) async {
+    Map<String, dynamic> data = await loadData();
+    tasks = data['tasks'];
+    isComplitedHide = data['isComplitedHide'];
+    //emit(TodoTaskLoadingState());
+    //_filterFunction();
+    TodoTaskLoadedState(tasks: resultList, doneCounter: doneCounter);
+  }

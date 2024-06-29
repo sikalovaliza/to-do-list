@@ -9,6 +9,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.6
+  http: ^1.2.1
 
 dev_dependencies:
   flutter_test:
@@ -16,5 +17,9 @@ dev_dependencies:
   flutter_lints: ^3.0.0
   intl: ^0.17.0
   logger: ^1.0.0
+  flutter_bloc: ^8.1.6
+  shared_preferences: ^2.2.3
+  dio: ^5.4.3
+
 flutter:
   uses-material-design: true

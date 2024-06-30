@@ -12,14 +12,14 @@ part 'to_do_tasks_state.dart';
 class ToDoTasksBloc extends Bloc<ToDoTasksEvent, ToDoTasksState> {
   List<Task> resultList = [];
   List<Task> tasks = items;
-  int count_id = 15;
   int doneCounter = 0;
   var logger = Logger();
   bool isComplitedHide = false;
 
   Future<void> saveData(List<Task> tasks, bool isComplitedHide) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> tasksJsonList = tasks.map((task) => jsonEncode(task.toJson())).toList();
+    List<String> tasksJsonList =
+        tasks.map((task) => jsonEncode(task.toJson())).toList();
     await prefs.setStringList('tasks', tasksJsonList);
     await prefs.setBool('isComplitedHide', isComplitedHide);
   }
@@ -27,12 +27,13 @@ class ToDoTasksBloc extends Bloc<ToDoTasksEvent, ToDoTasksState> {
   Future<Map<String, dynamic>> loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> tasksJsonList = prefs.getStringList('tasks') ?? [];
-    List<Task> tasks = tasksJsonList.map((taskJson) => Task.fromJson(jsonDecode(taskJson))).toList();
+    List<Task> tasks = tasksJsonList
+        .map((taskJson) => Task.fromJson(jsonDecode(taskJson)))
+        .toList();
     bool isComplitedHide = prefs.getBool('isComplitedHide') ?? false;
-    
+
     return {'tasks': tasks, 'isComplitedHide': isComplitedHide};
   }
-
 
   ToDoTasksBloc() : super(ToDoTasksInitial()) {
     on<TodoTasksLoadEvent>(_onTasksLoadEvent);
@@ -55,16 +56,8 @@ class ToDoTasksBloc extends Bloc<ToDoTasksEvent, ToDoTasksState> {
     emit(TodoTaskLoadedState(tasks: resultList, doneCounter: doneCounter));
   }
 
-  FutureOr<void> _onTodoTasksChange (
-    TodoTasksChangeDoneVisibilityEvent event, Emitter<ToDoTasksState> emit) {
-    emit(TodoTaskLoadingState());
-    isComplitedHide = !isComplitedHide;
-    _filterFunction();
-    emit(TodoTaskLoadedState(tasks: resultList, doneCounter: doneCounter));
-  }
-
   FutureOr<void> _onTasksChangeDoneEvent(
-    TodoTasksChangeDoneEvent event, Emitter<ToDoTasksState> emit) async {
+      TodoTasksChangeDoneEvent event, Emitter<ToDoTasksState> emit) async {
     emit(TodoTaskLoadedState(tasks: resultList, doneCounter: doneCounter + 1));
     tasks.firstWhere((element) => element.id == event.id).done =
         !tasks.firstWhere((element) => element.id == event.id).done;
@@ -74,7 +67,7 @@ class ToDoTasksBloc extends Bloc<ToDoTasksEvent, ToDoTasksState> {
   }
 
   FutureOr<void> _onTasksRemoveEvent(
-    TodoTasksRemoveEvent event, Emitter<ToDoTasksState> emit) {
+      TodoTasksRemoveEvent event, Emitter<ToDoTasksState> emit) {
     emit(TodoTaskLoadingState());
     tasks.removeWhere((element) => element.id == event.id);
     _filterFunction();
@@ -82,7 +75,7 @@ class ToDoTasksBloc extends Bloc<ToDoTasksEvent, ToDoTasksState> {
   }
 
   FutureOr<void> _onTodoTasksAddEvent(
-    TodoTasksAddEvent event, Emitter<ToDoTasksState> emit) {
+      TodoTasksAddEvent event, Emitter<ToDoTasksState> emit) {
     emit(TodoTaskLoadingState());
     tasks.add(event.task);
     _filterFunction();
@@ -90,7 +83,7 @@ class ToDoTasksBloc extends Bloc<ToDoTasksEvent, ToDoTasksState> {
   }
 
   FutureOr<void> _onTodoTasksChangeDoneVisibilityEvent(
-    TodoTasksChangeDoneVisibilityEvent event, Emitter<ToDoTasksState> emit) {
+      TodoTasksChangeDoneVisibilityEvent event, Emitter<ToDoTasksState> emit) {
     emit(TodoTaskLoadingState());
     isComplitedHide = !isComplitedHide;
     _filterFunction();
@@ -98,7 +91,7 @@ class ToDoTasksBloc extends Bloc<ToDoTasksEvent, ToDoTasksState> {
   }
 
   FutureOr<void> _onTodoTasksChangeTaskEvent(
-    TodoTasksChangeTaskEvent event, Emitter<ToDoTasksState> emit) {
+      TodoTasksChangeTaskEvent event, Emitter<ToDoTasksState> emit) {
     emit(TodoTaskLoadingState());
     _filterFunction();
     tasks[tasks.indexWhere((element) => element.id == event.id)] = event.task;

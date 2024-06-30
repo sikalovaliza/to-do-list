@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import '../../data/database.dart';
+import 'package:todo_list/presentation/screens/main_widgets/new_task.dart';
 import '../../bloc/tasks_bloc/to_do_tasks_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'task.dart';
@@ -9,18 +9,17 @@ import '../screens/main_widgets/app_bar.dart';
 
 final logger = Logger();
 int countOfDoneTask = 0;
-typedef UpdateTextCallback = void Function(int index, String newText, String newImportance);
+typedef UpdateTextCallback = void Function(
+    int index, String newText, String newImportance);
+
 class Main extends StatefulWidget {
   const Main({super.key});
 
   @override
-  _MainState createState() => _MainState();
+  MainState createState() => MainState();
 }
 
-
-
-class _MainState extends State<Main> {
-
+class MainState extends State<Main> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +41,8 @@ class _MainState extends State<Main> {
                             itemCount: state.tasks.length,
                             itemBuilder: (context, index) {
                               return Container(
-                                margin: const EdgeInsets.only(bottom: 0, right: 10, left: 10),
+                                margin: const EdgeInsets.only(
+                                    bottom: 0, right: 10, left: 10),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(5),
@@ -54,9 +54,10 @@ class _MainState extends State<Main> {
                             },
                           );
                         }
-                        return Container(); // Вернуть пустой контейнер в случае другого состояния
+                        return const Fastaddingtask();
                       },
                     ),
+                    const Fastaddingtask()
                   ],
                 ),
               ),
@@ -69,7 +70,7 @@ class _MainState extends State<Main> {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => TaskPage(),
+              builder: (context) => const TaskPage(),
             ),
           );
         },

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
 import '../../../data/database.dart';
 import '../../../bloc/tasks_bloc/to_do_tasks_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../task.dart';
 
-final logger = Logger();
 class TaskItem extends StatefulWidget {
   final Task task;
 
-  const TaskItem({super.key, 
+  const TaskItem({
+    super.key,
     required this.task,
   });
 
@@ -33,13 +32,15 @@ class _TaskItemState extends State<TaskItem> {
       movementDuration: Duration.zero,
       onDismissed: (direction) {
         if (direction == DismissDirection.startToEnd) {
-          logger.d('Item completed: ${widget.task.id}');
-         context
+          //logger.d('Item completed: ${widget.task.id}');
+          context
               .read<ToDoTasksBloc>()
               .add(TodoTasksChangeDoneEvent(id: widget.task.id));
         } else {
-          context.read<ToDoTasksBloc>().add(TodoTasksRemoveEvent(id: widget.task.id));
-          logger.d('Item deleted: ${widget.task.id}');
+          context
+              .read<ToDoTasksBloc>()
+              .add(TodoTasksRemoveEvent(id: widget.task.id));
+          //logger.d('Item deleted: ${widget.task.id}');
         }
       },
       child: ListTile(
@@ -52,10 +53,18 @@ class _TaskItemState extends State<TaskItem> {
           },
         ),
         title: Text(
-          widget.task.importance == 'important' ? '!! ${widget.task.text}' : widget.task.text,
+          widget.task.importance == 'important'
+              ? '!! ${widget.task.text}'
+              : widget.task.importance == 'low'
+                  ? '.. ${widget.task.text}'
+                  : widget.task.text,
           style: TextStyle(
-            decoration: widget.task.done ? TextDecoration.lineThrough : TextDecoration.none,
-            color: widget.task.importance == 'important' ? Colors.red : Colors.black,
+            decoration: widget.task.done
+                ? TextDecoration.lineThrough
+                : TextDecoration.none,
+            color: widget.task.importance == 'important'
+                ? Colors.red
+                : Colors.black,
           ),
           maxLines: 3,
         ),
@@ -65,8 +74,8 @@ class _TaskItemState extends State<TaskItem> {
             Navigator.of(context).push(
               MaterialPageRoute(
                   builder: (context) => TaskPage(
-                  task: widget.task,
-              )),
+                        task: widget.task,
+                      )),
             );
           },
         ),

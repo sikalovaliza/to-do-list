@@ -5,21 +5,18 @@ import '../screens/home.dart';
 import '../../data/database.dart';
 import '../../bloc/tasks_bloc/to_do_tasks_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-
-int countOfDoneTask = 0;
-
+import '../screens/tasks_widgets/delete_button.dart';
 
 class TaskPage extends StatefulWidget {
-  Task? task;
+  final Task? task;
 
-  TaskPage({super.key, this.task});
+  const TaskPage({super.key, this.task});
 
   @override
-  _TaskPageState createState() => _TaskPageState();
+  TaskPageState createState() => TaskPageState();
 }
 
-class _TaskPageState extends State<TaskPage> {
+class TaskPageState extends State<TaskPage> {
   late TextEditingController _textEditingController;
   String _selectedImportance = 'Нет';
   bool _isDateSet = false;
@@ -29,17 +26,22 @@ class _TaskPageState extends State<TaskPage> {
   @override
   void initState() {
     super.initState();
-    
+
     _textEditingController = TextEditingController();
-    
+
     if (widget.task != null) {
       _textEditingController.text = widget.task!.text;
       if (widget.task!.importance == 'important') {
         _selectedImportance = 'Высокий';
-      } else if(widget.task!.importance == 'low') {
+      } else if (widget.task!.importance == 'low') {
         _selectedImportance = 'Низкий';
       }
-      selectedDeadline = widget.task!.deadline;
+      if (widget.task?.deadline != null) {
+        selectedDeadline = widget.task!.deadline;
+        _selectedDate =
+            DateTime.fromMillisecondsSinceEpoch(selectedDeadline! * 1000);
+        _isDateSet = true;
+      }
     }
   }
 
@@ -52,59 +54,55 @@ class _TaskPageState extends State<TaskPage> {
   void _showDatePickerDialog() async {
     await initializeDateFormatting('ru');
     final DateTime? picked = await showDatePicker(
+      // ignore: use_build_context_synchronously
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(DateTime.now().year + 5),
     );
-
     if (picked != null) {
       final int deadlineTimestamp = picked.millisecondsSinceEpoch ~/ 1000;
-      setState(() {
-        _selectedDate = picked;
-        selectedDeadline = deadlineTimestamp;
-      });
+      _selectedDate = picked;
+      selectedDeadline = deadlineTimestamp;
     }
+    if (mounted) {}
   }
 
   String importance = 'low';
-  
 
   void saveTask() {
-    
     String userInput = _textEditingController.text;
     if (widget.task == null && userInput.isNotEmpty) {
       context.read<ToDoTasksBloc>().add(
-        TodoTasksAddEvent(
-          task: Task(
-            id: DateTime.now().toString(),
-            text: userInput,
-            importance: importance,
-            done: false,
-            deadline: selectedDeadline,
-            createdAt: 12345567,
-            changedAt: 12345667,
-            lastUpdatedBy: "22222332332"),
-        ),
-      );
+            TodoTasksAddEvent(
+              task: Task(
+                  id: DateTime.now().toString(),
+                  text: userInput,
+                  importance: importance,
+                  done: false,
+                  deadline: selectedDeadline,
+                  createdAt: 12345567,
+                  changedAt: 12345667,
+                  lastUpdatedBy: "22222332332"),
+            ),
+          );
     } else if (userInput.isNotEmpty) {
-        context.read<ToDoTasksBloc>().add(
-          TodoTasksChangeTaskEvent(
-            id: widget.task!.id,
-            task: Task(
-                id: widget.task!.id,
-                text: userInput,
-                importance: importance,
-                done: false,
-                deadline: selectedDeadline,
-                createdAt: 12345567,
-                changedAt: 12345667,
-                lastUpdatedBy: "20062024"),
-          ),
-        );
+      context.read<ToDoTasksBloc>().add(
+            TodoTasksChangeTaskEvent(
+              id: widget.task!.id,
+              task: Task(
+                  id: widget.task!.id,
+                  text: userInput,
+                  importance: importance,
+                  done: false,
+                  deadline: selectedDeadline,
+                  createdAt: 12345567,
+                  changedAt: 12345667,
+                  lastUpdatedBy: "20062024"),
+            ),
+          );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +155,7 @@ class _TaskPageState extends State<TaskPage> {
                     ),
               maxLines: 3,
             ),
-           const SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Row(
               children: [
                 const Text(
@@ -194,7 +192,7 @@ class _TaskPageState extends State<TaskPage> {
                       } else if (_selectedImportance == 'Высокий') {
                         importance = 'important';
                       }
-                   });
+                    });
                   },
                 ),
               ],
@@ -213,7 +211,7 @@ class _TaskPageState extends State<TaskPage> {
                     setState(() {
                       _isDateSet = value;
                     });
-                    if (value) {
+                    if (value && _selectedDate == null) {
                       _showDatePickerDialog();
                     }
                   },
@@ -226,20 +224,7 @@ class _TaskPageState extends State<TaskPage> {
                 style: const TextStyle(fontSize: 16, color: Colors.blue),
               ),
             const SizedBox(height: 16.0),
-            TextButton.icon(
-              onPressed: () {
-                context.read<ToDoTasksBloc>()
-                .add(TodoTasksRemoveEvent(id: widget.task!.id));
-              Navigator.of(context).pop();
-              },
-              icon: Icon(Icons.delete,
-                  color: widget.task == null ? Colors.red : Colors.grey),
-              label: Text(
-                'Удалить',
-                style:
-                    TextStyle(color:widget.task == null ? Colors.red : Colors.grey),
-              ),
-            ),
+            DeleteButton(widget: widget),
           ],
         ),
       ),
